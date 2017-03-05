@@ -52,7 +52,7 @@ class Category extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'parent_id' => 'Parent',
-            'name' => 'Name',
+            'name' => 'Category name',
         ];
     }
 

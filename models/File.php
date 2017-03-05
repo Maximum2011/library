@@ -10,10 +10,12 @@ use yii\db\Expression;
  *
  * @property integer $id
  * @property string $path
+ * @property string $base_url
  * @property string $type
  * @property integer $size
  * @property string $name
  * @property integer $created_at
+ * @property string $url
  *
  * @property Book[] $books
  */
@@ -50,7 +52,7 @@ class File extends \yii\db\ActiveRecord
         return [
             [['path'], 'required'],
             [['size'], 'integer'],
-            [['path'], 'string', 'max' => 1024],
+            [['path', 'base_url'], 'string', 'max' => 1024],
             [['type', 'name'], 'string', 'max' => 255],
         ];
     }
@@ -63,6 +65,7 @@ class File extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'path' => 'Path',
+            'base_url' => 'Base url',
             'type' => 'Type',
             'size' => 'Size',
             'name' => 'Name',
@@ -75,16 +78,18 @@ class File extends \yii\db\ActiveRecord
      * @param $size string
      * @param $type string
      * @param $path string
-     * @param $extension string
+     * @param $base_url string
      * @return File
+     * @internal param string $extension
      */
-    public static function create($name, $size, $type, $path)
+    public static function create($name, $size, $type, $path, $base_url)
     {
         $file = new self();
         $file->name = $name;
         $file->size = $size;
         $file->type = $type;
         $file->path = $path;
+        $file->base_url = $base_url;
         return $file;
     }
 
@@ -97,6 +102,11 @@ class File extends \yii\db\ActiveRecord
             $this->size = filesize($this->path);
         }
         return $this->size;
+    }
+
+    public function getUrl()
+    {
+        return $this->base_url . '/' . $this->path;
     }
 
 }

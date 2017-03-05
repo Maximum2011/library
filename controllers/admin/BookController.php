@@ -3,6 +3,7 @@
 namespace app\controllers\admin;
 
 use app\forms\BookCreateForm;
+use app\forms\MoveToCategoryForm;
 use app\managers\BookManager;
 use Yii;
 use app\models\Book;
@@ -11,6 +12,7 @@ use yii\base\Module;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 use yii\web\UploadedFile;
 
 /**
@@ -50,9 +52,15 @@ class BookController extends Controller
         $searchModel = new BookSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $moveToCategoryFor = new MoveToCategoryForm();
+        if ($moveToCategoryFor->load(Yii::$app->request->post()) && $moveToCategoryFor->validate()) {
+            $this->bookManager->moveToCategory($moveToCategoryFor);
+        }
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'moveToCategoryForm' => $moveToCategoryFor
         ]);
     }
 
@@ -77,8 +85,10 @@ class BookController extends Controller
     {
         $form = new BookCreateForm();
         if ($form->load(Yii::$app->request->post())) {
+
             $form->previewFile = UploadedFile::getInstance($form, 'previewFile');
             $form->bookFile = UploadedFile::getInstance($form, 'bookFile');
+
             if ($form->validate() && $book = $this->bookManager->create($form)) {
                 Yii::$app->session->setFlash('success', 'Book is created.');
                 return $this->redirect(['view', 'id' => $book->id]);
@@ -102,7 +112,8 @@ class BookController extends Controller
 
         if ($form->load(Yii::$app->request->post())) {
             $form->previewFile = UploadedFile::getInstance($form, 'previewFile');
-            $form->bookFile = UploadedFile::getInstance($form, 'previewFile');
+            $form->bookFile = UploadedFile::getInstance($form, 'bookFile');
+
             if ($form->validate()) {
                 $book = $this->bookManager->create($form);
                 Yii::$app->session->setFlash('success', 'Book is created.');

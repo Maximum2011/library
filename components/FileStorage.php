@@ -18,11 +18,19 @@ class FileStorage extends Component
      */
     public $basePath;
 
+    /**
+     * @var
+     */
+    public $baseUrl;
+
 
     public function init()
     {
         if ($this->basePath === null) {
             $this->basePath = 'uploads';
+        }
+        if ($this->baseUrl !== null) {
+            $this->baseUrl = \Yii::getAlias($this->baseUrl);
         }
     }
 
@@ -46,7 +54,8 @@ class FileStorage extends Component
                 $filename,
                 $uploadedFile->size,
                 $uploadedFile->type,
-                $path
+                $path,
+                $this->baseUrl
             );
             if ($file->save()) {
                 return $file;

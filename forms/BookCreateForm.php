@@ -84,7 +84,6 @@ class BookCreateForm extends Model
                 ['bookFile'],
                 'file',
                 'skipOnEmpty' => false,
-                'extensions' => ['doc', 'docx', 'pdf', 'mobi', 'epub', 'rtf']
             ],
         ];
     }

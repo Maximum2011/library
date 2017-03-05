@@ -20,6 +20,8 @@ use yii\db\Expression;
  * @property integer $category_id
  *
  * @property Category $category
+ * @property File $previewFile
+ * @property File $bookFile
  */
 class Book extends \yii\db\ActiveRecord
 {
@@ -54,7 +56,7 @@ class Book extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'link', 'category_id'], 'required'],
+            [['name'], 'required'],
             [['description'], 'string'],
             [['preview_file_id', 'book_file_id', 'category_id'], 'integer'],
             [['name', 'author'], 'string', 'max' => 255],
@@ -131,6 +133,11 @@ class Book extends \yii\db\ActiveRecord
     public static function find()
     {
         return new \app\models\queries\BookQuery(get_called_class());
+    }
+
+    public function assignTo(Category $category)
+    {
+        $this->populateRelation('category', $category);
     }
 
 
