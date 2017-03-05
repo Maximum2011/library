@@ -33,15 +33,15 @@ AppAsset::register($this);
             'class' => 'navbar-inverse navbar-fixed-top',
         ],
     ]);
-    echo Nav::widget([
-        'options' => ['class' => 'navbar-nav navbar-right'],
-        'items' => [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'Books', 'url' => ['/admin/book']],
-            ['label' => 'Categories', 'url' => ['/admin/category']],
-            Yii::$app->user->isGuest ? (
-                ['label' => 'Login', 'url' => ['/site/login']]
-            ) : (
+    $items = Yii::$app->user->isGuest ? [
+        ['label' => 'Home', 'url' => ['/site/index']],
+        ['label' => 'Books', 'url' => ['/book/index']],
+        ['label' => 'Login', 'url' => ['/site/login']]
+    ] : [
+        ['label' => 'Home', 'url' => ['/site/index']],
+        ['label' => 'Books', 'url' => ['/admin/book']],
+        ['label' => 'Categories', 'url' => ['/admin/category']],
+        (
                 '<li>'
                 . Html::beginForm(['/site/logout'], 'post')
                 . Html::submitButton(
@@ -51,7 +51,10 @@ AppAsset::register($this);
                 . Html::endForm()
                 . '</li>'
             )
-        ],
+    ];
+    echo Nav::widget([
+        'options' => ['class' => 'navbar-nav navbar-right'],
+        'items' => $items,
     ]);
     NavBar::end();
     ?>
