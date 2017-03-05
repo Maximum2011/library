@@ -21,18 +21,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'author') ?>
 
-    <?= $form->field($model, 'date_create') ?>
-
-    <?= $form->field($model, 'date_update') ?>
-
-    <?php // echo $form->field($model, 'preview') ?>
-
-    <?php // echo $form->field($model, 'description') ?>
-
-    <?php // echo $form->field($model, 'link') ?>
-
-    <?php // echo $form->field($model, 'category_id') ?>
-
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
         <?= Html::resetButton('Reset', ['class' => 'btn btn-default']) ?>

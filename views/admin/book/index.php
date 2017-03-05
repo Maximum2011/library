@@ -37,7 +37,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'date_update:datetime',
             'description:ntext',
             'category.name',
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'contentOptions' => [
+                    'style' => 'width: 100px; text-align:center;',
+                ],
+            ],
         ],
     ]); ?>
     <div class="pull-left">
@@ -57,7 +62,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 
 $js = <<<JS
-
 $('#move_to_category_form').on('beforeSubmit', function (e) {
     var keys = $("#grid_book").yiiGridView('getSelectedRows');
     var value = keys.toString();
@@ -65,6 +69,5 @@ $('#move_to_category_form').on('beforeSubmit', function (e) {
     $("#selection_field").val(value);
     return true;
 });
-
 JS;
 $this->registerJs($js);
