@@ -47,6 +47,25 @@ $config = [
         ],
 
     ],
+    'as globalAccess' => [
+        'class' => 'app\components\GlobalAccessBehavior',
+        'rules' => [
+            [
+                'controllers' => ['site'],
+                'allow' => true,
+            ],
+            [
+                'controllers' => ['book'],
+                'allow' => true,
+                'roles' => ['?'],
+            ],
+            [
+                'controllers' => ['admin/book', 'admin/category'],
+                'allow' => true,
+                'roles' => ['@'],
+            ],
+        ],
+    ],
     'params' => $params,
 ];
 
@@ -57,7 +76,16 @@ if (YII_ENV_DEV) {
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
         //'allowedIPs' => ['127.0.0.1', '::1'],
+        'as access' => [
+            'class' => 'app\components\GlobalAccessBehavior',
+            'rules' => [
+                [
+                    'allow' => true,
+                ],
+            ],
+        ],
     ];
+
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
