@@ -1,5 +1,6 @@
 <?php
 
+use app\forms\BookCreateForm;
 use app\models\Category;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -20,15 +21,38 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'previewFile')->fileInput()->label('Upload preview image') ?>
+    <div class="form-group">
+        <div class="row">
+            <?php if ($model->scenario !== BookCreateForm::SCENARIO_CREATE): ?>
+                <div class="col-lg-6">
+                    <?= Html::img($model->previewFile->url, ['class' => 'img-thumbnail']) ?>
+                </div>
+            <?php endif; ?>
+            <div class="col-lg-6">
+                <?= $form->field($model,
+                    'previewFile')->fileInput(['accept' => 'image/*'])->label('Upload preview image') ?>
+            </div>
+        </div>
+    </div>
 
-    <?= $form->field($model, 'bookFile')->fileInput()->label('Upload book file') ?>
+    <div class="form-group">
+        <div class="row">
+            <?php if ($model->scenario !== BookCreateForm::SCENARIO_CREATE): ?>
+                <div class="col-lg-6">
+                    <?= Html::a($model->bookFile->name, $model->bookFile->url, ['class' => 'btn btn-default btn-lg']) ?>
+                </div>
+            <?php endif; ?>
+            <div class="col-lg-6">
+                <?= $form->field($model, 'bookFile')->fileInput()->label('Upload book file') ?>
+            </div>
+        </div>
+    </div>
 
     <?= $form->field($model, 'category_id')->dropDownList(ArrayHelper::map(Category::find()->all(), 'id', 'name')) ?>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isCreateForm ? 'Create' : 'Update',
-            ['class' => $model->isCreateForm ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->scenario == BookCreateForm::SCENARIO_CREATE ? 'Create' : 'Update',
+            ['class' => $model->scenario == BookCreateForm::SCENARIO_CREATE ? 'btn btn-primary' : 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

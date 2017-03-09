@@ -4,11 +4,13 @@ namespace app\forms;
 
 use app\models\Category;
 use app\models\Book;
+use app\models\File;
 use yii\base\Model;
 use yii\web\UploadedFile;
 
 class BookCreateForm extends Model
 {
+    const SCENARIO_CREATE = 'create';
     /**
      * @var string
      */
@@ -26,18 +28,20 @@ class BookCreateForm extends Model
      * @var integer
      */
     public $category_id;
+
     /**
-     * @var bool
-     */
-    public $isCreateForm = true;
-    /**
-     * @var UploadedFile
+     * @var UploadedFile | File
      */
     public $previewFile;
     /**
-     * @var UploadedFile
+     * @var UploadedFile | File
      */
     public $bookFile;
+
+    /**
+     * @var integer
+     */
+    public $bookId;
 
     /**
      * @var Book
@@ -53,11 +57,15 @@ class BookCreateForm extends Model
     public function init()
     {
         if ($this->book) {
+            $this->bookId = $this->book->id;
             $this->name = $this->book->name;
             $this->description = $this->book->description;
             $this->category_id = $this->book->category->id;
             $this->author = $this->book->author;
-            $this->isCreateForm = false;
+            $this->previewFile = $this->book->previewFile;
+            $this->bookFile = $this->book->bookFile;
+        } else {
+            $this->scenario = self::SCENARIO_CREATE;
         }
         parent::init();
     }
@@ -68,7 +76,8 @@ class BookCreateForm extends Model
     public function rules()
     {
         return [
-            [['name', 'category_id', 'previewFile', 'bookFile'], 'required'],
+            [['name', 'category_id'], 'required'],
+            [['previewFile', 'bookFile'], 'required', 'on' => [self::SCENARIO_CREATE]],
             [['description'], 'string'],
             [['category_id'], 'integer'],
             [['name', 'author'], 'string', 'max' => 255],
@@ -79,11 +88,11 @@ class BookCreateForm extends Model
                 'targetClass' => Category::className(),
                 'targetAttribute' => ['category_id' => 'id']
             ],
-            [['previewFile'], 'image', 'skipOnEmpty' => false],
+            [['previewFile'], 'image', 'skipOnEmpty' => true],
             [
                 ['bookFile'],
                 'file',
-                'skipOnEmpty' => false,
+                'skipOnEmpty' => true,
             ],
         ];
     }

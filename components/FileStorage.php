@@ -8,6 +8,7 @@ use app\models\File;
 use Yii;
 use yii\base\Component;
 use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 class FileStorage extends Component
 {
@@ -36,30 +37,34 @@ class FileStorage extends Component
 
 
     /**
-     * @param $uploadedFile \yii\web\UploadedFile
+     * @param $file UploadedFile | File
      * @param bool $preserveFileName
      * @return bool|File
      */
-    public function save($uploadedFile, $preserveFileName = false)
+    public function save($file, $preserveFileName = false)
     {
+        if ($file instanceof File && file_exists($file->path)) {
+            return $file;
+        }
+
         if ($preserveFileName === false) {
-            $filename = implode('.', [\Yii::$app->security->generateRandomString(), $uploadedFile->getExtension()]);
+            $filename = implode('.', [\Yii::$app->security->generateRandomString(), $file->getExtension()]);
         } else {
-            $filename = $uploadedFile->baseName;
+            $filename = $file->baseName;
         }
 
         $path = $this->getUploadPath($filename);
 
-        if ($uploadedFile->saveAs($path)) {
-            $file = File::create(
+        if ($file->saveAs($path)) {
+            $fileObject = File::create(
                 $filename,
-                $uploadedFile->size,
-                $uploadedFile->type,
+                $file->size,
+                $file->type,
                 $path,
                 $this->baseUrl
             );
-            if ($file->save()) {
-                return $file;
+            if ($fileObject->save()) {
+                return $fileObject;
             }
         }
         return false;
@@ -97,7 +102,8 @@ class FileStorage extends Component
     }
 
     /**
-     * @param $path
+     * @param $file
+     * @internal param $path
      */
     public function afterSave($file)
     {

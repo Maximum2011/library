@@ -4,51 +4,86 @@ namespace app\managers;
 
 
 use app\components\FileStorage;
-use app\forms\BookCreateForm;
-use app\forms\MoveToCategoryForm;
 use app\models\Book;
 use app\models\Category;
+use app\components\TransactionService;
+use app\models\File;
 use yii\web\NotFoundHttpException;
+use yii\web\UploadedFile;
+
 
 class BookManager
 {
     private $fileStorage;
 
-    public function __construct(FileStorage $fileStorage)
+    private $transactionService;
+
+    public function __construct(FileStorage $fileStorage, TransactionService $transactionService)
     {
         $this->fileStorage = $fileStorage;
+        $this->transactionService = $transactionService;
     }
 
     /**
-     * @param BookCreateForm $form
+     * @param $name
+     * @param $category_id integer
+     * @param $description string
+     * @param $author string
+     * @param $previewFile UploadedFile
+     * @param $bookFile UploadedFile
+     * @param Book $book
+     * @return Book
      */
-    public function create(BookCreateForm $form)
+    public function create(
+        $name,
+        $category_id,
+        $description,
+        $author,
+        UploadedFile $previewFile = null,
+        UploadedFile $bookFile = null,
+        $book = null
+    )
     {
-        $book = Book::create(
-            $form->name,
-            $this->findCategory($form->category_id),
-            $this->fileStorage->save($form->previewFile),
-            $this->fileStorage->save($form->bookFile),
-            $form->description,
-            $form->author
-        );
-        if ($book->save(false)) {
-            return $book;
+        if ($book == null) {
+            $book = Book::create(
+                $name,
+                $this->findCategory($category_id),
+                $description,
+                $author
+            );
+        } else {
+            $book->name = $name;
+            $book->description = $description;
+            $book->author = $author;
+            $book->assignCategory(Category::findOne($category_id));
         }
-        return false;
+        $this->transactionService->execute(function () use ($book, $previewFile, $bookFile) {
+            if ($previewFile !== null) {
+                $previewFile = $this->fileStorage->save($previewFile, true);
+                $book->assignPreviewFile($previewFile);
+            }
+            if ($bookFile !== null) {
+                $bookFile = $this->fileStorage->save($bookFile, true);
+                $book->assignBookFile($bookFile);
+            }
+            $book->save(false);
+        });
+        return $book;
     }
 
+
     /**
-     * @param MoveToCategoryForm $form
+     * @param $bookIds array
+     * @param $categoryId integer
      * @return bool
      */
-    public function moveToCategory(MoveToCategoryForm $form)
+    public function moveToCategory(array $bookIds, $categoryId)
     {
-        $category = $this->findCategory($form->category_id);
+        $category = $this->findCategory($categoryId);
         $result = true;
-        foreach ($form->getBookIds() as $id) {
+        foreach ($bookIds as $id) {
             $book = $this->findBook($id);
-            $book->assignTo($category);
+            $book->assignCategory($category);
             $result = $book->save() && $result;
         }
         return $result;

@@ -3,11 +3,11 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Book */
+/* @var $model \app\forms\BookCreateForm */
 
 $this->title = 'Update Book: ' . $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Books', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->bookId]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
 <div class="book-update">

@@ -135,17 +135,9 @@ class Book extends \yii\db\ActiveRecord
         return new \app\models\queries\BookQuery(get_called_class());
     }
 
-    public function assignTo(Category $category)
-    {
-        $this->populateRelation('category', $category);
-    }
-
-
     /**
      * @param $name string
      * @param Category $category
-     * @param File $previewFile
-     * @param File $bookFile
      * @param string $description
      * @param string $author
      * @return Book
@@ -153,20 +145,42 @@ class Book extends \yii\db\ActiveRecord
     public static function create(
         $name,
         Category $category,
-        File $previewFile,
-        File $bookFile,
         $description = '',
         $author = ''
     ) {
         $book = new self();
         $book->name = $name;
-        $book->populateRelation('category', $category);
-        $book->populateRelation('previewFile', $previewFile);
-        $book->populateRelation('bookFile', $bookFile);
+        $book->assignCategory($category);
         $book->description = $description;
         $book->author = $author;
         return $book;
     }
+
+    /**
+     * @param Category $category
+     */
+    public function assignCategory(Category $category)
+    {
+        $this->populateRelation('category', $category);
+    }
+
+    /**
+     * @param File $previewFile
+     */
+    public function assignPreviewFile(File $previewFile)
+    {
+        $this->populateRelation('previewFile', $previewFile);
+    }
+
+    /**
+     * @param File $bookFile
+     */
+    public function assignBookFile(File $bookFile)
+    {
+        $this->populateRelation('bookFile', $bookFile);
+    }
+
+
 
     public function beforeSave($insert)
     {

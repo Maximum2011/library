@@ -9,6 +9,10 @@ return [
     'id' => 'basic-tests',
     'basePath' => dirname(__DIR__),    
     'language' => 'en-US',
+    'aliases' => [
+        '@tests' => __DIR__ . '/../tests',
+        '@webroot' => '@tests'
+    ],
     'components' => [
         'db' => $dbParams,
         'mailer' => [

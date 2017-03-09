@@ -54,7 +54,7 @@ class BookController extends Controller
 
         $moveToCategoryFor = new MoveToCategoryForm();
         if ($moveToCategoryFor->load(Yii::$app->request->post()) && $moveToCategoryFor->validate()) {
-            $this->bookManager->moveToCategory($moveToCategoryFor);
+            $this->bookManager->moveToCategory($moveToCategoryFor->getBookIds(), $moveToCategoryFor->category_id);
         }
 
         return $this->render('index', [
@@ -89,7 +89,15 @@ class BookController extends Controller
             $form->previewFile = UploadedFile::getInstance($form, 'previewFile');
             $form->bookFile = UploadedFile::getInstance($form, 'bookFile');
 
-            if ($form->validate() && $book = $this->bookManager->create($form)) {
+            if ($form->validate()) {
+                $book = $this->bookManager->create(
+                    $form->name,
+                    $form->category_id,
+                    $form->description,
+                    $form->author,
+                    $form->previewFile,
+                    $form->bookFile
+                );
                 Yii::$app->session->setFlash('success', 'Book is created.');
                 return $this->redirect(['view', 'id' => $book->id]);
             };
@@ -111,12 +119,21 @@ class BookController extends Controller
         $form = new BookCreateForm($book);
 
         if ($form->load(Yii::$app->request->post())) {
+
             $form->previewFile = UploadedFile::getInstance($form, 'previewFile');
             $form->bookFile = UploadedFile::getInstance($form, 'bookFile');
 
             if ($form->validate()) {
-                $book = $this->bookManager->create($form);
-                Yii::$app->session->setFlash('success', 'Book is created.');
+                $book = $this->bookManager->create(
+                    $form->name,
+                    $form->category_id,
+                    $form->description,
+                    $form->author,
+                    $form->previewFile,
+                    $form->bookFile,
+                    $book
+                );
+                Yii::$app->session->setFlash('success', 'Book is update.');
                 return $this->redirect(['view', 'id' => $book->id]);
             };
         };
