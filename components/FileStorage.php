@@ -14,25 +14,26 @@ class FileStorage extends Component
     const EVENT_AFTER_SAVE = 'afterSave';
 
     /**
-     * @var
+     * @var string
      */
-    public $basePath;
+    private $basePath;
 
     /**
-     * @var
+     * @var string
      */
-    public $baseUrl;
+    private $baseUrl;
 
 
-    public function init()
+    public function __construct($basePath = '@webroot/uploads', $baseUrl = '@web/uploads', array $config = [])
     {
-        if ($this->basePath === null) {
-            $this->basePath = 'uploads';
+        $this->basePath = $basePath;
+
+        if ($baseUrl !== null) {
+            $this->baseUrl = \Yii::getAlias($baseUrl);
         }
-        if ($this->baseUrl !== null) {
-            $this->baseUrl = \Yii::getAlias($this->baseUrl);
-        }
+        parent::__construct($config);
     }
+
 
     /**
      * @param $uploadedFile \yii\web\UploadedFile
@@ -89,10 +90,10 @@ class FileStorage extends Component
 
     }
 
-    public function getUploadPath($fileName)
+    private function getUploadPath($fileName)
     {
         $path = FileHelper::normalizePath($this->basePath);
-        return $fileName ? Yii::getAlias($path . '/' . $fileName) : null;
+        return $fileName ? Yii::getAlias($path) . '/' . $fileName : null;
     }
 
     /**
